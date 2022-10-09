@@ -41,7 +41,7 @@ export default function TopAgentPieChart() {
             type="Pie"
             innerRadius="80"
             dataLabel={{
-              visible: true,
+              visible: false,
               position: "Inside",
               name: "text",
               font: {

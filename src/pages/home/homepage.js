@@ -7,8 +7,13 @@ import TopAgentPieChart from "./components/top-agent-pie-chart";
 
 export function Homepage() {
   return (
-    <>
-      <div className="p-12">
+    <div className="h-screen overflow-auto">
+      <nav className="block sticky md:hidden lg:hidden sm:hidden w-full h-14 bg-[#272945]">
+        <ul>
+          <li>Menu</li>
+        </ul>
+      </nav>
+      <div className="px-2 flex-grow">
         <div className="flex lg:flex-row gap-6 flex-col">
           <div className="flex-1">
             <MarketingQuantityTable />
@@ -26,6 +31,6 @@ export function Homepage() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }

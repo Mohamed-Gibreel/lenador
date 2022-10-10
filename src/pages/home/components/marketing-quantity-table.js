@@ -3,7 +3,7 @@ import React from "react";
 export default function MarketingQuantityTable() {
   return (
     <div className="bg-white shadow-lg rounded-lg w-full p-6 h-96">
-      <div className="mb-8">Completed Marketing Quantity</div>
+      <div className="mb-8 text-sm font-bold">Completed Marketing Quantity</div>
       <table className="w-[inherit] h-[80%]">
         <thead>
           <tr>

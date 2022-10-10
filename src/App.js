@@ -18,6 +18,14 @@ import SideNav, {
   NavText,
 } from "@trendmicro/react-sidenav";
 import "@trendmicro/react-sidenav/dist/react-sidenav.css";
+import "./style/sidebar-nav.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  solid,
+  regular,
+  brands,
+  icon,
+} from "@fortawesome/fontawesome-svg-core/import.macro"; // <-- import styles to be used
 
 import { Homepage } from "./pages/home/index";
 import { useState } from "react";
@@ -37,13 +45,19 @@ function App() {
       <SideNav
         onSelect={handleSelect}
         onToggle={handleToggle}
-        className="hidden md:block lg:block sm:block"
+        className={`block ${
+          isSideBarExpanded
+            ? "h-screen w-full lg:w-16"
+            : "h-16 w-full lg:w-16 lg:h-screen"
+        }  overflow-hidden !relative lg:!absolute`}
+        componentClass="nav"
       >
         <SideNav.Toggle />
         <SideNav.Nav defaultSelected="home">
           <NavItem eventKey="home">
             <NavIcon>
-              <i className="fa fa-fw fa-home" style={{ fontSize: "1.75em" }} />
+              {/* <i className="fa fa-fw fa-home" style={{ fontSize: "1.75em" }} /> */}
+              <FontAwesomeIcon icon={solid("user-secret")} />
             </NavIcon>
             <NavText>Home</NavText>
           </NavItem>
@@ -58,7 +72,9 @@ function App() {
           </NavItem>
         </SideNav.Nav>
       </SideNav>
-      <div className={`${isSideBarExpanded ? "pl-[240px]" : "pl-[64px]"}`}>
+      <div
+        className={`${isSideBarExpanded ? "lg:pl-[240px]" : "lg:pl-[68px]"}`}
+      >
         <Router>
           <Routes>
             <Route path="/" element={<Homepage />} />

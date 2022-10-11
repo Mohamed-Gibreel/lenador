@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   AccumulationChartComponent,
   AccumulationSeriesCollectionDirective,
@@ -9,8 +9,34 @@ import {
   AccumulationTooltip,
   AccumulationDataLabel,
 } from "@syncfusion/ej2-react-charts";
+import { getTopAgentByTotalQrders } from "../data/analytics/api";
 
-export default function TopAgentPieChart() {
+export function TopAgentPieChart() {
+  const [topAgentData, setTopAgentData] = useState([]);
+  useEffect(() => {
+    fetchData();
+    return () => {};
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      let topAgentData = await getTopAgentByTotalQrders();
+      let data = [];
+      for (var dataIndex in topAgentData.data) {
+        data.push({
+          x: topAgentData.data[dataIndex].agentNameEn,
+          y: topAgentData.data[dataIndex].totalCount,
+        });
+      }
+      setTopAgentData(data);
+    } catch (e) {
+      console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
+      console.log("SOMETHING WENT WRONG");
+      console.log(e);
+      console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
+    }
+  };
+
   const data1 = [
     { x: "United States", y: 45, text: "USA", fill: "#00226C" },
     { x: "Australia", y: 53, text: "AUS", fill: "#0450C2" },
@@ -20,8 +46,8 @@ export default function TopAgentPieChart() {
     { x: "United Kingdom", y: 20, text: "UK", fill: "#0450C2" },
   ];
   return (
-    <div className="bg-white shadow-lg rounded-lg w-full mb-4 p-6 h-96">
-      <div className="">Top agent by total quantity</div>
+    <div className="bg-white shadow-lg rounded-lg w-full flex flex-col p-6 h-96 gap-y-4">
+      <div className="text-sm font-bold">Top agent by total quantity</div>
       <AccumulationChartComponent className="h-full">
         <Inject
           services={[
@@ -33,7 +59,7 @@ export default function TopAgentPieChart() {
         />
         <AccumulationSeriesCollectionDirective>
           <AccumulationSeriesDirective
-            dataSource={data1}
+            dataSource={topAgentData.length > 0 ? topAgentData : data1}
             animation={false}
             xName="x"
             explode={false}
@@ -41,9 +67,8 @@ export default function TopAgentPieChart() {
             type="Pie"
             innerRadius="80"
             dataLabel={{
-              visible: false,
-              position: "Inside",
-              name: "text",
+              visible: true,
+              position: "Outside",
               font: {
                 fontWeight: "600",
               },

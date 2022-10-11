@@ -1,89 +1,59 @@
-import logo from "./logo.svg";
-import "./App.css";
-
+//React
+import { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Link,
-  useRouteMatch,
-  useParams,
+  useNavigate,
 } from "react-router-dom";
 
-import SideNav, {
-  Toggle,
-  Nav,
-  NavItem,
-  NavIcon,
-  NavText,
-} from "@trendmicro/react-sidenav";
-import "@trendmicro/react-sidenav/dist/react-sidenav.css";
-import "./style/sidebar-nav.css";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  solid,
-  regular,
-  brands,
-  icon,
-} from "@fortawesome/fontawesome-svg-core/import.macro"; // <-- import styles to be used
+import axios from "axios";
 
-import { Homepage } from "./pages/home/index";
-import { useState } from "react";
+//Pages
+import { Homepage } from "./components/index";
 
-function App() {
-  const [isSideBarExpanded, setIsSideBarExpanded] = useState(false);
-  const [selected, setSelected] = useState("home");
-  const handleToggle = (expanded) => {
-    setIsSideBarExpanded(expanded);
-  };
-  const handleSelect = (selected) => {
-    setSelected(selected);
-  };
+import Sidebar from "./components/sidebar";
+import { setDarkTheme } from "./features/theme/themeSlice";
+import LoginScreen from "./screens/auth/loginscreen";
+import { useDispatch } from "react-redux";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import ProtectedRoute from "./components/private-route";
 
+export default function App() {
+  useEffect(() => {
+    if (
+      localStorage.getItem("color-theme") === "dark" ||
+      (!("color-theme" in localStorage) &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches)
+    ) {
+      dispatch(setDarkTheme(true));
+      localStorage.setItem("color-theme", "dark");
+      document.documentElement.classList.add("dark");
+    } else {
+      dispatch(setDarkTheme(false));
+      localStorage.setItem("color-theme", "light");
+      document.documentElement.classList.remove("dark");
+    }
+    return () => {};
+  }, []);
+  const dispatch = useDispatch();
   return (
-    <div className="h-screen overflow-hidden">
-      <SideNav
-        onSelect={handleSelect}
-        onToggle={handleToggle}
-        className={`block ${
-          isSideBarExpanded
-            ? "h-screen w-full lg:w-16"
-            : "h-16 w-full lg:w-16 lg:h-screen"
-        }  overflow-hidden !relative lg:!absolute`}
-        componentClass="nav"
-      >
-        <SideNav.Toggle />
-        <SideNav.Nav defaultSelected="home">
-          <NavItem eventKey="home">
-            <NavIcon>
-              {/* <i className="fa fa-fw fa-home" style={{ fontSize: "1.75em" }} /> */}
-              <FontAwesomeIcon icon={solid("user-secret")} />
-            </NavIcon>
-            <NavText>Home</NavText>
-          </NavItem>
-          <NavItem eventKey="devices">
-            <NavIcon>
-              <i
-                className="fa fa-fw fa-device"
-                style={{ fontSize: "1.75em" }}
-              />
-            </NavIcon>
-            <NavText>Devices</NavText>
-          </NavItem>
-        </SideNav.Nav>
-      </SideNav>
-      <div
-        className={`${isSideBarExpanded ? "lg:pl-[240px]" : "lg:pl-[68px]"}`}
-      >
-        <Router>
-          <Routes>
-            <Route path="/" element={<Homepage />} />
-            <Route path="/topics" element={<div>About Page</div>} />
-          </Routes>
-        </Router>
-      </div>
-    </div>
+    <>
+      <ToastContainer />
+      <Router>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Sidebar children={<Homepage />} />{" "}
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/login" element={<LoginScreen />} />
+        </Routes>
+      </Router>
+    </>
   );
 }
-
-export default App;

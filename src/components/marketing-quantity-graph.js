@@ -1,20 +1,43 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
-  AxisModel,
-  Category,
   ChartComponent,
   DateTime,
-  DateTimeCategory,
   Inject,
   Legend,
   SeriesCollectionDirective,
   SeriesDirective,
   SplineAreaSeries,
-  SplineSeries,
   Tooltip,
 } from "@syncfusion/ej2-react-charts";
+import { getQuantityByMonth } from "../data/analytics/api";
 
-export default function MarketingQuantityGraph() {
+export function MarketingQuantityGraph() {
+  const [quantityData, setQuantityData] = useState([]);
+
+  useEffect(() => {
+    fetchData();
+    return () => {};
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      let quantityDataFromApi = await getQuantityByMonth();
+      let data = [];
+      quantityDataFromApi.data.forEach((record) =>
+        data.push({
+          x: new Date(2022, record.month - 1 ?? 0, 1),
+          y: record.totalQuantity,
+        })
+      );
+      setQuantityData(data);
+    } catch (e) {
+      console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
+      console.log("SOMETHING WENT WRONG!");
+      console.log(e);
+      console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
+    }
+  };
+
   const primaryXAxis = {
     valueType: "DateTime",
   };
@@ -40,11 +63,15 @@ export default function MarketingQuantityGraph() {
     width: 10,
     border: { width: 1, color: "blue" },
   };
+
   return (
-    <div className="bg-white shadow-lg rounded-lg w-full mb-4 p-6 h-96">
-      <div className="">Completed Marketing Quantity</div>
+    <div className="bg-white shadow-lg rounded-lg w-full h-96 flex flex-col p-6 gap-y-4 basis-0">
+      <div className="text-sm font-bold">Completed Marketing Quantity</div>
       <ChartComponent
         primaryXAxis={primaryXAxis}
+        primaryYAxis={{
+          minimum: 0,
+        }}
         legendSettings={legendSettings}
         tooltip={tooltip}
         className="h-full"
@@ -52,7 +79,7 @@ export default function MarketingQuantityGraph() {
         <Inject services={[SplineAreaSeries, DateTime, Legend, Tooltip]} />
         <SeriesCollectionDirective>
           <SeriesDirective
-            dataSource={data}
+            dataSource={quantityData.length > 0 ? quantityData : data}
             xName="x"
             yName="y"
             type="SplineArea"
